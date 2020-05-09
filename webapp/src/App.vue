@@ -1,38 +1,59 @@
 <template>
   <div id="app">
     <h2 class="title">mapkicker</h2>
-    <div class="logo">
-      <img :src="logoSVG" height="150px" alt="logo" />
-    </div>
-    <div>
-      This project is generated with
-      <b>
-        <a href="https://github.com/shpota/goxygen">goxygen</a>
-      </b>.
-      <p />The following list of technologies comes from
-      a REST API call to the Go-based back end. Find
-      and change the corresponding code in
-      <code>webapp/src/components/Tech.vue</code>
-      and <code>server/web/app.go</code>.
-      <Tech />
-    </div>
+    <Mappool />
+    <form id="chatbox">
+      <textarea id="msgbox"></textarea>
+      <input type="submit" value="送信" />
+    </form>
   </div>
 </template>
 
 <script>
-import Tech from './components/Tech.vue'
+import Mappool from "./components/Mappool.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Tech
+    Mappool
   },
   data() {
     return {
-      logoSVG: require('./assets/logo.svg')
-    }
+      logoSVG: require("./assets/logo.svg")
+    };
   }
 };
+
+window.onload = () => {
+  let socket;
+  const msgbox = document.getElementById("msgbox");
+  const chatbox = document.getElementById("chatbox");
+  chatbox.addEventListener("submit", e => {
+    e.preventDefault();
+    if (!msgbox.value) return false;
+    if (!socket) {
+      alert("Error: no websocket connection");
+      return false;
+    }
+    socket.send(msgbox.value);
+    msgbox.value = "";
+    return false;
+  });
+
+  if (!window["WebSocket"]) {
+    alert("Error, WebSocket isn't supported.");
+  } else {
+    socket = new WebSocket("ws://localhost:8080/room");
+    socket.onclose = () => {
+      alert("Connection closed.");
+    };
+    socket.onmessage = e => {
+      console.log(e.data);
+    };
+  }
+};
+
+// alert("Hello");
 </script>
 
 <style>
@@ -41,8 +62,8 @@ body {
   padding-right: 5%;
   padding-left: 5%;
   font-size: larger;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
