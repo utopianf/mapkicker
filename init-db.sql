@@ -11,3 +11,6 @@ insert into technologies values (
 insert into technologies values (
   'MySQL', 'A powerful, open source object-relational database'
 );
+insert into technologies values (
+  'Mob-Programming', 'A powerful way to enhance learning'
+)
