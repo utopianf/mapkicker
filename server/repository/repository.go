@@ -4,22 +4,24 @@ import (
 	"mapkicker/domain"
 )
 
-type RepositoryOnMemory struct {
+// OnMemory は、dbに依存しない揮発性のrepository.
+type OnMemory struct {
 	manager *domain.Manager
 }
 
-func (r *RepositoryOnMemory) RegisterManager(m *domain.Manager) error {
-	r.manager = m
-	return nil
+// Manager は、Managerインスタンスを返す。
+func (r *OnMemory) Manager() *domain.Manager {
+	return r.manager
 }
 
-func (r *RepositoryOnMemory) Manager() *domain.Manager {
-	return r.manager
+// AllMaps は、現在のマッププールに属するすべてのマップを返す
+func (r *OnMemory) AllMaps() []domain.Map {
+	return nil
 }
 
 // NewRepository は、リポジトリを得る。
 func NewRepository() domain.Repository {
-	return &RepositoryOnMemory{
+	return &OnMemory{
 		manager: domain.GetManager(),
 	}
 }

@@ -1,6 +1,7 @@
 package domain
 
+// Repository は、リポジトリのインタフェース
 type Repository interface {
-	RegisterManager(*Manager) error
 	Manager() *Manager
+	AllMaps() []Map
 }
