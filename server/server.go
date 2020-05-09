@@ -2,11 +2,12 @@ package main
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
-	"os"
-	"mapkicker/db"
+	"mapkicker/repository"
 	"mapkicker/web"
+	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
@@ -15,9 +16,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer d.Close()
+	r := repository.NewRepository()
 	// CORS is enabled only in prod profile
 	cors := os.Getenv("profile") == "prod"
-	app := web.NewApp(db.NewDB(d), cors)
+	app := web.NewApp(r, cors)
 	err = app.Serve()
 	log.Println("Error", err)
 }

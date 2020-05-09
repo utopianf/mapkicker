@@ -3,60 +3,41 @@ package web
 import (
 	"encoding/json"
 	"log"
-	"mapkicker/db"
+	"mapkicker/domain"
 	"net/http"
 )
 
 // App is application
 type App struct {
-	d        db.DB
+	r        domain.Repository
 	handlers map[string]http.HandlerFunc
 }
 
 // NewApp creates new app object
-func NewApp(d db.DB, cors bool) App {
+func NewApp(r domain.Repository, cors bool) App {
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true } // TODO: コンストラクタにしてまとめる
 	app := App{
-		d:        d,
 		handlers: make(map[string]http.HandlerFunc),
 	}
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-	r := newRoom()
-	techHandler := app.GetTechnologies
 	mappoolHandler := app.GetMappool
-	roomHandler := r.ServeHTTP
 	if !cors {
-		techHandler = disableCors(techHandler)
 		mappoolHandler = disableCors(mappoolHandler)
-		// roomHandler = disableCors(roomHandler)
 	}
-	app.handlers["/api/technologies"] = techHandler
 	app.handlers["/api/mappool"] = mappoolHandler
-	app.handlers["/room"] = roomHandler
+	app.handlers["/echo"] = Echo
 	app.handlers["/"] = http.FileServer(http.Dir("/webapp")).ServeHTTP
 	return app
 }
 
 // Serve listens to port 8080
 func (a *App) Serve() error {
+	r := newRoom()
+	http.Handle("/room", r)
 	for path, handler := range a.handlers {
 		http.Handle(path, handler)
 	}
 	log.Println("Web server is available on port 8080")
 	return http.ListenAndServe(":8080", nil)
-}
-
-// GetTechnologies returns technologies
-func (a *App) GetTechnologies(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	technologies, err := a.d.GetTechnologies()
-	if err != nil {
-		sendErr(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	err = json.NewEncoder(w).Encode(technologies)
-	if err != nil {
-		sendErr(w, http.StatusInternalServerError, err.Error())
-	}
 }
 
 // GetMappool returns mappool

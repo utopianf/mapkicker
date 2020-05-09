@@ -1,6 +1,10 @@
 package web
 
-import "github.com/gorilla/websocket"
+import (
+	"fmt"
+
+	"github.com/gorilla/websocket"
+)
 
 type client struct {
 	socket *websocket.Conn
@@ -11,6 +15,7 @@ type client struct {
 func (c *client) read() { // clientがメッセージを送信したときに呼ばれる 主語がserver
 	for {
 		if _, msg, err := c.socket.ReadMessage(); err == nil {
+			fmt.Println(fmt.Sprintf("client.read %v", msg))
 			c.room.forward <- msg
 		} else {
 			break
@@ -20,6 +25,7 @@ func (c *client) read() { // clientがメッセージを送信したときに呼
 }
 func (c *client) write() { // clientにサーバーからメッセージを配信するときに使う 主語がserver
 	for msg := range c.send {
+		fmt.Println(fmt.Sprintf("client.write %v", msg))
 		if err := c.socket.WriteMessage(websocket.TextMessage, msg); err != nil {
 			break
 		}
