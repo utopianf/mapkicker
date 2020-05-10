@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"mapkicker/domain"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 type App struct {
 	r        domain.Repository
 	handlers map[string]http.HandlerFunc
+	judge    *domain.Judge
 }
 
 // NewApp creates new app object
@@ -19,20 +21,21 @@ func NewApp(r domain.Repository, cors bool) App {
 	app := App{
 		handlers: make(map[string]http.HandlerFunc),
 	}
+	app.judge = domain.NewJudge(0)
+	app.judge.Run()
 	mappoolHandler := app.GetMappool
+	joinHandler := app.Join
 	if !cors {
 		mappoolHandler = disableCors(mappoolHandler)
 	}
 	app.handlers["/api/mappool"] = mappoolHandler
-	app.handlers["/echo"] = Echo
+	app.handlers["/join"] = joinHandler
 	app.handlers["/"] = http.FileServer(http.Dir("/webapp")).ServeHTTP
 	return app
 }
 
 // Serve listens to port 8080
 func (a *App) Serve() error {
-	r := newRoom()
-	http.Handle("/room", r)
 	for path, handler := range a.handlers {
 		http.Handle(path, handler)
 	}
@@ -56,6 +59,31 @@ func (a *App) GetMappool(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		sendErr(w, http.StatusInternalServerError, err.Error())
 	}
+}
+
+// Join は、新しい参加者をJudge(mapkick session)に参加させる。
+func (a *App) Join(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Access to /join")
+	socket, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatalf("Join: %v", err)
+		return
+	}
+	a.judge.AddNewParticipant(socket) // TODO: 参加者の名前をつける
+	go func() {
+		for {
+			if _, msg, err := socket.ReadMessage(); err == nil {
+				s := string(msg)
+				fmt.Println(fmt.Sprintf("msg %v was sent", s))
+				a.judge.Share(s)
+			} else {
+				break
+			}
+		}
+		if err := socket.Close(); err != nil {
+			fmt.Println(err)
+		}
+	}()
 }
 
 func sendErr(w http.ResponseWriter, code int, message string) {

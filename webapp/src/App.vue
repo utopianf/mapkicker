@@ -1,21 +1,22 @@
 <template>
   <div id="app">
     <h2 class="title">mapkicker</h2>
+    <h3>Chat</h3>
+    <Chat />
+    <h3>Mappool</h3>
     <Mappool />
-    <form id="chatbox">
-      <textarea id="msgbox"></textarea>
-      <input type="submit" value="送信" />
-    </form>
   </div>
 </template>
 
 <script>
 import Mappool from "./components/Mappool.vue";
+import Chat from "./components/Chat.vue";
 
 export default {
   name: "App",
   components: {
-    Mappool
+    Mappool,
+    Chat
   },
   data() {
     return {
@@ -23,45 +24,6 @@ export default {
     };
   }
 };
-
-window.onload = () => {
-  let socket;
-  const msgbox = document.getElementById("msgbox");
-  const chatbox = document.getElementById("chatbox");
-  chatbox.addEventListener("submit", e => {
-    e.preventDefault();
-    if (!msgbox.value) return false;
-    if (!socket) {
-      alert("Error: no websocket connection");
-      return false;
-    }
-    socket.send(msgbox.value);
-    msgbox.value = "";
-    return false;
-  });
-
-  if (!window["WebSocket"]) {
-    alert("Error, WebSocket isn't supported.");
-  } else {
-    const url = "ws://localhost:8080/echo";
-    socket = new WebSocket(url);
-    socket.onclose = () => {
-      console.log(`Websocket connection to ${url} has been closed.`);
-    };
-    socket.onmessage = e => {
-      console.table(e.data);
-    };
-    socket.onopen = () => {
-      console.log("Websocket has opened");
-    };
-    socket.onerror = e => {
-      console.error("Websocket has an error");
-      console.table(e);
-    };
-  }
-};
-
-// alert("Hello");
 </script>
 
 <style>
