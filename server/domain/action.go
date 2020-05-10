@@ -8,6 +8,14 @@ type Action struct {
 	msg           string
 }
 
+type Broadcast struct {
+	seq     int
+	actions []Action
+}
+
+type ValidationError struct {
+}
+
 func NewChat(seq, participantID int, msg string) Action {
 	return Action{
 		seq:           seq,
