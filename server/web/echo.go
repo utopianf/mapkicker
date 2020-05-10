@@ -15,13 +15,19 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	go func() {
-		for {
+		// N回echoしたらsocketを閉じてみる
+		N := 5
+		for i := 0; i < N; i++ {
 			if _, msg, err := socket.ReadMessage(); err == nil {
-				fmt.Println(fmt.Sprintf("Read msg %v", msg))
-				socket.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("ECHO: %v", msg)))
+				s := string(msg)
+				fmt.Println(fmt.Sprintf("Read msg %v", s))
+				socket.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("ECHO: %v", s)))
 			} else {
 				break
 			}
+		}
+		if err := socket.Close(); err != nil {
+			fmt.Println(err)
 		}
 	}()
 }

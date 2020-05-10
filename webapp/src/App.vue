@@ -43,19 +43,19 @@ window.onload = () => {
   if (!window["WebSocket"]) {
     alert("Error, WebSocket isn't supported.");
   } else {
-    socket = new WebSocket("ws://localhost:8080/echo");
+    const url = "ws://localhost:8080/echo";
+    socket = new WebSocket(url);
     socket.onclose = () => {
-      alert("Connection closed.");
+      console.log(`Websocket connection to ${url} has been closed.`);
     };
     socket.onmessage = e => {
-      console.log(e.data);
+      console.table(e.data);
     };
-    socket.onopen = e => {
+    socket.onopen = () => {
       console.log("Websocket has opened");
-      console.table(e);
     };
     socket.onerror = e => {
-      console.log("Websocket has an error");
+      console.error("Websocket has an error");
       console.table(e);
     };
   }

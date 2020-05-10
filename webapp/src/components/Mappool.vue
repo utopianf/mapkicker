@@ -18,7 +18,6 @@ export default {
   },
   mounted() {
     axios.get(`${process.env.VUE_APP_API_URL}/api/mappool`).then(response => {
-      console.table(response);
       return (this.mappool = response.data);
     });
   }
