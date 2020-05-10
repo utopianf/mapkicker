@@ -12,6 +12,7 @@ type Judge struct {
 	join         chan *Participant
 	participants []*Participant
 	history      []string
+	seq          int // Actionの整合性を確保するための、受理ずみActionの最後のsequence番号
 }
 
 // NewJudge は、指定したidを持つJudgeインスタンスを生成する。
@@ -20,6 +21,7 @@ func NewJudge(id int) *Judge {
 	return &Judge{
 		id:   id,
 		join: make(chan *Participant),
+		seq:  -1,
 	}
 }
 
@@ -32,6 +34,20 @@ func (j *Judge) AddNewParticipant(socket *websocket.Conn) *Participant {
 		p.socket.WriteMessage(websocket.TextMessage, []byte(msg))
 	}
 	return p
+}
+
+// Send はJudgeにActionを送る。validationが成功した場合はtrue、失敗するとfalseを返す。
+// また、Judgeに属するParticipantにメッセージを送信する。
+func (j *Judge) Send(a Action) bool {
+	if !j.validateSequence(a) {
+		return false
+	}
+	j.seq++
+	return true
+}
+
+func (j *Judge) validateSequence(a Action) bool {
+	return a.seq == j.seq+1
 }
 
 func (j *Judge) Run() {
