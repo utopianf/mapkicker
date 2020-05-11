@@ -1,12 +1,13 @@
 <template>
-  <div class="mappool">
-    <div v-for="map in mappool" v-bind:key="map">
-      <input type="checkbox" :id="map" :value="map" v-model="checkedMaps" />
-      <label :for="map">{{map}}</label>
+  <div>
+    <div class="mappool">
+      <div v-for="map in mappool" v-bind:key="map">
+        <input type="checkbox" :id="map" :value="map" v-model="checkedMaps" />
+        <label :for="map">{{map}}</label>
+      </div>
     </div>
-    <br />
-    <span>Checked Maps: {{ checkedMaps }}</span>
-    <br />
+    <!-- <span>Checked Maps: {{ checkedMaps }}</span>
+    <br /> -->
     <button v-on:click="kickMap">Kick!</button>
   </div>
 </template>
@@ -50,6 +51,8 @@ export default Vue.component("Mappool", {
 
 <style scoped>
 .mappool {
-  margin-top: 5px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
 }
 </style>

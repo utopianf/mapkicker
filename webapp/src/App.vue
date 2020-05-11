@@ -1,10 +1,17 @@
 <template>
   <div id="app">
-    <h2 class="title">mapkicker</h2>
-    <h3>Chat</h3>
-    <Chat />
-    <h3>Mappool</h3>
-    <Mappool />
+    <header class="title">mapkicker</header>
+    <!-- <h2 class="title">mapkicker</h2> -->
+    <div class="holyGrail">
+      <main class="content">
+        <h3>Chat</h3>
+        <Chat />
+        <h3>Mappool</h3>
+        <Mappool />
+      </main>
+      <nav class="side-nav"></nav>
+      <aside class="side-bar"></aside>
+    </div>
   </div>
 </template>
 
@@ -37,6 +44,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
 @media screen and (min-width: 800px) {
@@ -51,6 +62,29 @@ body {
     padding-right: 30%;
     padding-left: 30%;
   }
+}
+
+header,
+footer {
+  flex: 0;
+}
+
+.holyGrail {
+  display: flex;
+  flex: 1;
+}
+
+.content {
+  flex: 1
+}
+
+.side-nav,
+.side-bar {
+  width: 200px;
+}
+
+.side-nav {
+  order: -1;
 }
 
 code {
