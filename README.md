@@ -18,37 +18,45 @@ docker --version
 docker-compose --version
 ```
 
-## Start in development mode
+### Goの設定
 
-In the project directory run the command (you might
-need to prepend it with `sudo` depending on your setup):
-```sh
-docker-compose -f docker-compose-dev.yml up
+* `GOPATH`環境変数を設定します。 `~/go`などにするのが標準的です。
+* `PATH`に`$GOPATH/bin`を追加します。これによって、`go get`でインストールしたツールにpathが通ります。
+
+### ツール
+
+#### goreman (開発モードでのサーバ起動を簡略化する)
+
+```
+go get github.com/mattn/goreman
 ```
 
-This starts a local MySQL database on `localhost:3306`.
-The database will be populated with test records from
-the [init-db.sql](init-db.sql) file.
+#### gin(バックエンドのライブリロードに用いる)
 
-Navigate to the `server` folder and start the back end:
-
-```sh
-cd server
-go run server.go
 ```
-The back end will serve on http://localhost:8080.
+go get github.com/codegangsta/gin
+```
 
-Navigate to the `webapp` folder, install dependencies,
-and start the front end development server by running:
+## Development modeで起動する
+
+### 古い手順 
+
+#### frontendの依存ライブラリ(毎回やる必要はない)
 
 ```sh
 cd webapp
 npm install
-npm start
 ```
-The application will be available on http://localhost:3000.
- 
-## Start in production mode
+
+#### 実行
+
+プロジェクトルートにおいて,
+
+```sh
+goreman start
+```
+
+## Production modeで起動する
 
 Perform:
 ```sh

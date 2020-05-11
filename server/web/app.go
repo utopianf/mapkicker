@@ -34,13 +34,13 @@ func NewApp(r domain.Repository, cors bool) App {
 	return app
 }
 
-// Serve listens to port 8080
+// Serve listens to port 8081
 func (a *App) Serve() error {
 	for path, handler := range a.handlers {
 		http.Handle(path, handler)
 	}
-	log.Println("Web server is available on port 8080")
-	return http.ListenAndServe(":8080", nil)
+	log.Println("Backend server is available on port 8081")
+	return http.ListenAndServe(":8081", nil)
 }
 
 // GetMappool returns mappool
@@ -74,7 +74,7 @@ func (a *App) Join(w http.ResponseWriter, r *http.Request) {
 		for {
 			if _, msg, err := socket.ReadMessage(); err == nil {
 				s := string(msg)
-				fmt.Println(fmt.Sprintf("msg %v was sent", s))
+				fmt.Println(fmt.Sprintf("Chat: %v", s))
 				a.judge.Share(s)
 			} else {
 				break
